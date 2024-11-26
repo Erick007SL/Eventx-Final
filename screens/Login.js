@@ -34,7 +34,7 @@ export default function Login() {
   const entrar = async () => {
     if (validar()) {
         try {
-            const response = await axios.post('http://20.9.130.209:3000/api/users/login', {
+            const response = await axios.post('http://192.168.0.113:3000/api/users/login', {
                 email: email,
                 password: password,
             });
