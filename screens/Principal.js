@@ -6,10 +6,12 @@ import { useNavigation } from "@react-navigation/native";
 import { Camera } from 'expo-camera';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Button } from 'react-native-elements';
+import axios from 'axios';
 
 const Tab = createBottomTabNavigator();
 const { width, height } = Dimensions.get('window');
 
+// Feed Component
 const Feed = () => {
   const navigation = useNavigation();
 
@@ -20,73 +22,106 @@ const Feed = () => {
   );
 }
 
+const Eventos = ({ navigation }) => {
+  const [eventos, setEventos] = useState([]);
 
-const Eventos = () => {
-  const eventos = [
-    { id: 1, title: 'Intensivão React.JS e typescript', image: require('../images/typescript.jpg') },
-    { id: 2, title: 'Música e Inteligência Artificial', image: require('../images/musica.jpg') },
-    { id: 3, title: 'Educação financeira', image: require('../images/reuniao.jpg') },
-    { id: 4, title: 'Imersão Phyton', image: require('../images/python.jpg') },
-  ];
+  // Função para buscar eventos
+  const fetchEventos = async () => {
+    try {
+      const response = await axios.get('http://192.168.0.113:3000/api/events');
+      setEventos(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar eventos:', error);
+    }
+  };
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('pt-BR').format(date);
+  };
+
+  useEffect(() => {
+    fetchEventos();
+  }, []);
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        {eventos.map(evento => (
-          <View key={evento.id} style={styles.card}>
-            <Text style={styles.cardTitle}>{evento.title}</Text>
-            <View style={styles.CardImagens}>
-              <Image source={evento.image} style={styles.Fotos} />
+        {eventos.length > 0 ? (
+          eventos.map((evento) => (
+            <View key={evento.id} style={styles.cardInicio}>
+              <Text style={styles.cardTitle}>{evento.title}</Text>
+              <Text style={styles.cardDescription}>{evento.description}</Text>
+              
+              {/* Exibindo a data do evento */}
+              <Text style={styles.cardDate}>Data:{formatDate(evento.date)}</Text>
+              
+              
+              
+              <Button
+                title="Ver mais..."
+                onPress={() => navigation.navigate('DetalhesEvento', { eventoId: evento.id })} // Passando o eventoId para a próxima tela
+              />
             </View>
-            <Button
-              buttonStyle={styles.buttonCard}
-              title="Ver mais..."
-              onPress={() => alert(`Entrar no ${evento.title}`)}
-            />
-          </View>
-        ))}
+          ))
+        ) : (
+          <Text>Carregando eventos...</Text>
+        )}
       </ScrollView>
     </View>
   );
 };
-
-
+// Início Component
 const Inicio = () => {
-  const feed = [
-    { id: 1, title: 'Aulão Banco de Dados', image: require('../images/banco.jpg') },
-    { id: 2, title: 'Aprenda Java', image: require('../images/java.jpg') },
-    { id: 3, title: 'O Data Science', image: require('../images/datasience.jpg') },
-    { id: 4, title: 'Javascript descomplicado', image: require('../images/javascript.jpg') },
-  ];
+  // Estado para armazenar os eventos
+  const [feed, setFeed] = useState([]);
+
+  // Função para buscar os eventos da API usando axios
+  const fetchEventos = async () => {
+    try {
+      const response = await axios.get('http://192.168.0.113:3000/api/events'); // Substitua pela URL da sua API
+      setFeed(response.data); // Atualiza o estado com os eventos recebidos
+    } catch (error) {
+      console.error('Erro ao buscar eventos:', error);
+    }
+  };
+
+  // UseEffect para buscar os eventos quando o componente for montado
+  useEffect(() => {
+    fetchEventos();
+  }, []);
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        {feed.map(feed => (
-          <View key={feed.id} style={styles.cardInicio}>
-            <Text style={styles.cardTitle}>{feed.title}</Text>
-            <View style={styles.CardImagens}>
-              <Image source={feed.image} style={styles.Fotos} />
+        {feed.length > 0 ? (
+          feed.map((evento) => (
+            <View key={evento.id} style={styles.cardInicio}>
+              <Text style={styles.cardTitle}>{evento.title}</Text>
+              {/* Exibe a descrição do evento */}
+              <Text style={styles.cardDescription}>{evento.description}</Text>
+              <Button
+                buttonStyle={styles.buttonCard}
+                title="Ver mais..."
+                onPress={() => alert(`Entrar no evento: ${evento.title}`)}
+              />
             </View>
-            <Button
-              buttonStyle={styles.buttonCard}
-              title="Ver mais..."
-              onPress={() => alert(`Entrar no ${feed.title}`)}
-            />
-          </View>
-        ))}
+          ))
+        ) : (
+          <Text>Carregando eventos...</Text> // Exibe enquanto os eventos não estiverem carregados
+        )}
       </ScrollView>
     </View>
   );
-};
+};// Profile Component
 const Profile = () => {
   return (
     <View style={styles.container}>
       <Text>Perfil da pessoa!</Text>
     </View>
   );
-}
+};
 
+// Scanner Component
 const Scanner = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -101,17 +136,9 @@ const Scanner = () => {
 
   useEffect(() => {
     const animateScanner = Animated.loop(
-      Animated.sequence([
-        Animated.timing(animation, {
-          toValue: height - 40,
-          duration: 2500,
-          useNativeDriver: true
-        }),
-        Animated.timing(animation, {
-          toValue: 0,
-          duration: 2000,
-          useNativeDriver: true
-        })
+      Animated.sequence([ 
+        Animated.timing(animation, { toValue: height - 40, duration: 2500, useNativeDriver: true }),
+        Animated.timing(animation, { toValue: 0, duration: 2000, useNativeDriver: true })
       ])
     );
     animateScanner.start();
@@ -134,11 +161,7 @@ const Scanner = () => {
 
   return (
     <View style={styles.container}>
-      <Camera
-        style={styles.camera}
-        type={Camera.Constants.Type.back}
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-      >
+      <Camera style={styles.camera} type={Camera.Constants.Type.back} onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}>
         <View style={styles.overlay}>
           <View style={styles.unfocusedContainer}></View>
           <View style={[styles.focusedContainer, { width: width - 40 }]}>
@@ -155,68 +178,41 @@ const Scanner = () => {
       </Camera>
     </View>
   );
-}
+};
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'lightgray',
+    padding: 10,
   },
   scrollViewContainer: {
-    alignItems: 'center',
-    flexGrow: 1,
-  },
-  card: {
-    width: 350,
-    height: 350,
-    margin: 5,
-    padding: 10,
-    backgroundColor: '#006da4',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    paddingBottom: 20,
   },
   cardInicio: {
-    width: 350,
-    height: 350,
-    margin: 5,
-    padding: 10,
-    backgroundColor: '#006da4',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    marginBottom: 15,
+    padding: 15,  // Aumenta o espaçamento interno para dar um pouco mais de área
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    elevation: 3,
+    width: '80%',  // Define a largura do card para 80% da tela
+    maxWidth: 350, // Limita a largura máxima do card
+    alignSelf: 'center', // Centraliza o card horizontalmente
   },
   cardTitle: {
-    paddingTop: 10,
-    textAlign: 'center',
-    color: 'white',
     fontSize: 18,
-    backgroundColor: '#032030',
-    width: '100%',
-    height: '15%',
-    elevation: 15,
-    shadowColor: 'white'
+    fontWeight: 'bold',
+  },
+  cardDescription: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#333',
   },
   buttonCard: {
-    width: 100,
-    alignSelf: 'center',
-    backgroundColor: '#032023',
+    marginTop: 15,
+    backgroundColor: '#4CAF50',
   },
 
-  CardImagens: {
-    borderRadius: 10,
-    elevation: 10,
-    width: '100%',
-    height: '60%',
-    backgroundColor: '#004d74',
-
-  },
-  Fotos: {
-    width: '100%',
-    height: '100%',
-
-
-  },
   camera: {
     flex: 1,
     alignItems: 'center',
@@ -252,20 +248,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     padding: 10,
   },
-  CardImagens: {
-    width: '100%',
-    height: 200,
-    marginBottom: 10,
-  },
-  Fotos: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10,
-    resizeMode: 'cover',
-  },
 });
 
-
+// Main Navigator Component
 const Principal = () => {
   return (
     <Tab.Navigator initialRouteName='Feed' screenOptions={{ tabBarActiveTintColor: 'blue' }}>
@@ -275,17 +260,6 @@ const Principal = () => {
         options={({ navigation }) => ({
           tabBarLabel: 'Início',
           tabBarIcon: ({ color, size }) => (<MaterialIcons name="home" color={color} size={size} />),
-          // headerRight: () => (
-          //   <MaterialIcons
-          //     name="logout"
-          //     size={24}
-          //     color="red"
-          //     style={{ marginRight: 10 }}
-          //     onPress={() => {
-          //       navigation.navigate('Login');
-          //     }}
-          //   />
-          // ),
           headerTitle: ""
         })}
       />
@@ -296,7 +270,6 @@ const Principal = () => {
           tabBarLabel: 'Eventos',
           tabBarIcon: ({ color, size }) => (<MaterialIcons name="event" color={color} size={size} />),
           headerTitle: "",
-
         }}
       />
       <Tab.Screen
@@ -304,7 +277,8 @@ const Principal = () => {
         component={Scanner}
         options={{
           tabBarLabel: 'Leitor de QrCode',
-          tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name="data-matrix-scan" color={color} size={size} />), headerTitle: "",
+          tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name="data-matrix-scan" color={color} size={size} />),
+          headerTitle: "",
         }}
       />
       <Tab.Screen
@@ -312,24 +286,12 @@ const Principal = () => {
         component={Profile}
         options={({ navigation }) => ({
           tabBarLabel: 'Perfil',
-          tabBarIcon: ({ color, size }) => (<MaterialIcons name="person" color={color} size={size} />),
-          headerRight: () => (
-            <MaterialIcons
-              name="logout"
-              size={24}
-              color="blue"
-              style={{ marginRight: 10 }}
-              onPress={() => {
-                navigation.navigate('Login');
-              }}
-            />
-          ),
+          tabBarIcon: ({ color, size }) => (<MaterialIcons name="account-circle" color={color} size={size} />),
           headerTitle: "",
-
         })}
       />
     </Tab.Navigator>
   );
-}
+};
 
 export default Principal;
