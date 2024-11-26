@@ -7,6 +7,13 @@ import { Camera } from 'expo-camera';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Button } from 'react-native-elements';
 import axios from 'axios';
+import Eventos from './Eventos'
+
+const formatDate = (date) => {
+  const d = new Date(date);
+  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+};
+
 
 const Tab = createBottomTabNavigator();
 const { width, height } = Dimensions.get('window');
@@ -22,55 +29,7 @@ const Feed = () => {
   );
 }
 
-const Eventos = ({ navigation }) => {
-  const [eventos, setEventos] = useState([]);
 
-  // Função para buscar eventos
-  const fetchEventos = async () => {
-    try {
-      const response = await axios.get('http://192.168.0.113:3000/api/events');
-      setEventos(response.data);
-    } catch (error) {
-      console.error('Erro ao buscar eventos:', error);
-    }
-  };
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('pt-BR').format(date);
-  };
-
-  useEffect(() => {
-    fetchEventos();
-  }, []);
-
-  return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        {eventos.length > 0 ? (
-          eventos.map((evento) => (
-            <View key={evento.id} style={styles.cardInicio}>
-              <Text style={styles.cardTitle}>{evento.title}</Text>
-              <Text style={styles.cardDescription}>{evento.description}</Text>
-              
-              {/* Exibindo a data do evento */}
-              <Text style={styles.cardDate}>Data:{formatDate(evento.date)}</Text>
-              
-              
-              
-              <Button
-                title="Ver mais..."
-                onPress={() => navigation.navigate('DetalhesEvento', { eventoId: evento.id })} // Passando o eventoId para a próxima tela
-              />
-            </View>
-          ))
-        ) : (
-          <Text>Carregando eventos...</Text>
-        )}
-      </ScrollView>
-    </View>
-  );
-};
-// Início Component
 const Inicio = () => {
   // Estado para armazenar os eventos
   const [feed, setFeed] = useState([]);
@@ -78,7 +37,7 @@ const Inicio = () => {
   // Função para buscar os eventos da API usando axios
   const fetchEventos = async () => {
     try {
-      const response = await axios.get('http://192.168.0.113:3000/api/events'); // Substitua pela URL da sua API
+      const response = await axios.get('http://192.168.0.110:3000/api/events'); // Substitua pela URL da sua API
       setFeed(response.data); // Atualiza o estado com os eventos recebidos
     } catch (error) {
       console.error('Erro ao buscar eventos:', error);
@@ -96,9 +55,15 @@ const Inicio = () => {
         {feed.length > 0 ? (
           feed.map((evento) => (
             <View key={evento.id} style={styles.cardInicio}>
+              {evento.coverImage && (
+                <Image
+                  source={{ uri: `http://192.168.0.110:3000/uploads/${evento.coverImage}` }}
+                  style={styles.cardImage} resizeMode='contain'
+                />
+              )}
               <Text style={styles.cardTitle}>{evento.title}</Text>
-              {/* Exibe a descrição do evento */}
               <Text style={styles.cardDescription}>{evento.description}</Text>
+                  <Text style={styles.cardDate}>Data: {formatDate(evento.date)}</Text>
               <Button
                 buttonStyle={styles.buttonCard}
                 title="Ver mais..."
@@ -107,16 +72,22 @@ const Inicio = () => {
             </View>
           ))
         ) : (
-          <Text>Carregando eventos...</Text> // Exibe enquanto os eventos não estiverem carregados
+          <Text style={styles.emptyMessage}>Carregando eventos...</Text> // Exibe enquanto os eventos não estiverem carregados
         )}
       </ScrollView>
     </View>
   );
-};// Profile Component
+};
+
+
 const Profile = () => {
   return (
     <View style={styles.container}>
-      <Text>Perfil da pessoa!</Text>
+      <Button
+        buttonStyle={styles.buttonCard}
+        title="Sair"
+        onPress={() => alert('Sair')}
+      />
     </View>
   );
 };
@@ -136,7 +107,7 @@ const Scanner = () => {
 
   useEffect(() => {
     const animateScanner = Animated.loop(
-      Animated.sequence([ 
+      Animated.sequence([
         Animated.timing(animation, { toValue: height - 40, duration: 2500, useNativeDriver: true }),
         Animated.timing(animation, { toValue: 0, duration: 2000, useNativeDriver: true })
       ])
@@ -185,69 +156,51 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-  },
-  scrollViewContainer: {
+},
+scrollViewContainer: {
     paddingBottom: 20,
-  },
-  cardInicio: {
+},
+cardInicio: {
     marginBottom: 15,
-    padding: 15,  // Aumenta o espaçamento interno para dar um pouco mais de área
+    padding: 15,
     backgroundColor: '#f5f5f5',
     borderRadius: 8,
     elevation: 3,
-    width: '80%',  // Define a largura do card para 80% da tela
-    maxWidth: 350, // Limita a largura máxima do card
-    alignSelf: 'center', // Centraliza o card horizontalmente
-  },
-  cardTitle: {
+    height: 380,
+    width: '85%',
+    maxWidth: 350,
+    alignSelf: 'center',
+    justifyContent: 'space-between',
+},
+cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  cardDescription: {
+},
+cardDescription: {
     marginTop: 10,
     fontSize: 14,
     color: '#333',
-  },
-  buttonCard: {
+},
+cardDate: {
+    marginTop: 10,
+    fontSize: 12,
+    color: '#555',
+},
+buttonCard: {
     marginTop: 15,
     backgroundColor: '#4CAF50',
-  },
-
-  camera: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  overlay: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-  },
-  focusedContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  unfocusedContent: {
-    flex: 1,
-  },
-  focusArea: {
-    width: 250,
-    height: 250,
-    borderWidth: 2,
-    borderColor: 'white',
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  animationLine: {
-    height: 2,
+},
+cardImage: {
     width: '100%',
-    backgroundColor: 'red'
-  },
-  buttonContainer: {
-    backgroundColor: 'transparent',
-    padding: 10,
-  },
+    height: 200,
+    borderRadius: 8,
+},
+emptyMessage: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#999',
+    marginTop: 20,
+},
 });
 
 // Main Navigator Component
@@ -286,8 +239,13 @@ const Principal = () => {
         component={Profile}
         options={({ navigation }) => ({
           tabBarLabel: 'Perfil',
-          tabBarIcon: ({ color, size }) => (<MaterialIcons name="account-circle" color={color} size={size} />),
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="account-circle" color={color} size={size} />
+          ),
           headerTitle: "",
+          headerRight: () => (
+            <MaterialIcons name="logout" onPress={() => navigation.navigate('Login')} size={26} color="#f00" />
+          ),
         })}
       />
     </Tab.Navigator>

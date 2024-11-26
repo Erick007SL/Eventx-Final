@@ -11,7 +11,7 @@ const DetalhesEvento = ({ route, navigation }) => {
     const fetchEventoDetalhes = async () => {
       try {
         // Requisição para pegar os detalhes do evento usando o ID
-        const response = await axios.get(`http://192.168.0.113:3000/api/events/${eventoId}`);
+        const response = await axios.get(`http://192.168.0.110:3000/api/events/${eventoId}`);
         setEvento(response.data);
       } catch (error) {
         console.error('Erro ao buscar os detalhes do evento:', error);
@@ -36,7 +36,6 @@ const DetalhesEvento = ({ route, navigation }) => {
       <Text style={styles.description}>{evento.description}</Text>
       <Text style={styles.date}>Data: {evento.date}</Text>
 
-      {/* Se tiver mais informações sobre o evento, exiba aqui */}
 
       <Button title="Voltar" onPress={() => navigation.goBack()} />
     </View>

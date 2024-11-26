@@ -34,7 +34,7 @@ export default function Login() {
   const entrar = async () => {
     if (validar()) {
         try {
-            const response = await axios.post('http://192.168.0.113:3000/api/users/login', {
+            const response = await axios.post('http://192.168.0.110:3000/api/users/login', {
                 email: email,
                 password: password,
             });
@@ -71,8 +71,10 @@ export default function Login() {
   return (
     <View style={[styles.container, specificStyle.container]}>
       <Text style={specificStyle.logo} h1>
-        Event<Text style={{ color: "blue" }} h3>X</Text>
+        Otnev<Text style={{ color: "blue" }} h3>e</Text>
       </Text>
+      <Text style={specificStyle.span}> Seja bem-vindo ao nosso App, Otneve agradece a sua preferência. </Text>
+      
       <Input
         placeholder="E-mail: "
         leftIcon={{ type: "font-awesome", name: "envelope" }}
@@ -118,10 +120,10 @@ export default function Login() {
 
 const specificStyle = StyleSheet.create({
   container: {
-    paddingTop: 40,
-    flex: 1, // Adicionado para garantir que a tela ocupe todo o espaço disponível
-    justifyContent: 'center', // Centraliza verticalmente
-    alignItems: 'center', // Centraliza horizontalmente
+    paddingTop: 60,
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   textRow: {
     flexDirection: 'row',
@@ -135,7 +137,14 @@ const specificStyle = StyleSheet.create({
     fontSize: 18,
   },
   logo: {
-    marginBottom: 20, // Ajuste a margem conforme necessário
+    marginBottom: 30, // Ajuste a margem conforme necessário
     textAlign: 'center', // Centraliza o texto do logo
+  },
+  span: {
+    marginBottom: 150,
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#858585',
   },
 });
