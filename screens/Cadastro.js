@@ -50,7 +50,8 @@ export default function Cadastro() {
   const salvar = async () => {
     if (validar()) {
       try {
-        const response = await axios.post('http://192.168.0.110:3000/api/users/register', {
+        const response = await axios.post('http://20.9.130.209:3000/api/users/register', {
+        // const response = await axios.post('http://192.168.0.110:3000/api/users/register', {
           username: nome,
           email: email,
           password: senha,
@@ -115,7 +116,7 @@ export default function Cadastro() {
         checkedIcon="check"
         uncheckedIcon="square-o"
         checkedColor="blue"
-        uncheckedColor="red"
+        uncheckedColor="blue"
         checked={isSelected}
         onPress={() => setisSelected(!isSelected)}
       />
@@ -129,6 +130,7 @@ export default function Cadastro() {
     </View>
   );
 }
+
 
 const specificStyle = StyleSheet.create({
   Text: {

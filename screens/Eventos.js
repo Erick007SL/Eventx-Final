@@ -5,7 +5,7 @@ const Eventos = ({ navigation }) => {
     const [eventos, setEventos] = useState([]);
 
     useEffect(() => {
-        fetch('http://192.168.0.110:3000/api/events')
+        fetch('http://20.9.130.209:3000/api/events')
             .then((response) => response.json())
             .then((data) => setEventos(data))
             .catch((error) => console.error('Erro ao carregar eventos:', error));
@@ -24,7 +24,7 @@ const Eventos = ({ navigation }) => {
                         <View key={evento.id} style={styles.cardInicio}>
                             {evento.coverImage && (
                                 <Image
-                                    source={{ uri: `http://192.168.0.110:3000/uploads/${evento.coverImage}` }}
+                                    source={{ uri: `http://20.9.130.209:3000/uploads/${evento.coverImage}` }}
                                     style={styles.cardImage} resizeMode='contain'
                                 />
                             )}
@@ -47,6 +47,7 @@ const Eventos = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: 'lightgray',
         flex: 1,
         padding: 10,
     },

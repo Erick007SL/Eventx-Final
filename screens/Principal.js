@@ -8,6 +8,7 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Button } from 'react-native-elements';
 import axios from 'axios';
 import Eventos from './Eventos'
+import Login from './Login';
 
 const formatDate = (date) => {
   const d = new Date(date);
@@ -57,13 +58,13 @@ const Inicio = () => {
             <View key={evento.id} style={styles.cardInicio}>
               {evento.coverImage && (
                 <Image
-                  source={{ uri: `http://192.168.0.110:3000/uploads/${evento.coverImage}` }}
+                  source={{ uri: `http://20.9.130.209:3000/uploads/${evento.coverImage}` }}
                   style={styles.cardImage} resizeMode='contain'
                 />
               )}
               <Text style={styles.cardTitle}>{evento.title}</Text>
               <Text style={styles.cardDescription}>{evento.description}</Text>
-                  <Text style={styles.cardDate}>Data: {formatDate(evento.date)}</Text>
+              <Text style={styles.cardDate}>Data: {formatDate(evento.date)}</Text>
               <Button
                 buttonStyle={styles.buttonCard}
                 title="Ver mais..."
@@ -83,11 +84,15 @@ const Inicio = () => {
 const Profile = () => {
   return (
     <View style={styles.container}>
-      <Button
-        buttonStyle={styles.buttonCard}
-        title="Sair"
-        onPress={() => alert('Sair')}
-      />
+      <View style={{ backgroundColor: 'gray', width: '40%', borderRadius: 100, alignSelf: 'center', marginTop: 30 }}>
+        <MaterialIcons name="person" size={150} color="black" />
+      </View>
+      <Text style={{ paddingLeft: 20, fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Nome:___________________</Text>
+      <Text style={{ paddingLeft: 20, fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Nome:___________________</Text>
+      <Text style={{ paddingLeft: 20, fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Nome:___________________</Text>
+      <Text style={{ paddingLeft: 20, fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Nome:___________________</Text>
+
+
     </View>
   );
 };
@@ -151,16 +156,16 @@ const Scanner = () => {
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-},
-scrollViewContainer: {
+    backgroundColor: 'lightgray',
+  },
+  scrollViewContainer: {
     paddingBottom: 20,
-},
-cardInicio: {
+  },
+  cardInicio: {
     marginBottom: 15,
     padding: 15,
     backgroundColor: '#f5f5f5',
@@ -171,42 +176,42 @@ cardInicio: {
     maxWidth: 350,
     alignSelf: 'center',
     justifyContent: 'space-between',
-},
-cardTitle: {
+  },
+  cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-},
-cardDescription: {
+  },
+  cardDescription: {
     marginTop: 10,
     fontSize: 14,
     color: '#333',
-},
-cardDate: {
+  },
+  cardDate: {
     marginTop: 10,
     fontSize: 12,
     color: '#555',
-},
-buttonCard: {
+  },
+  buttonCard: {
     marginTop: 15,
     backgroundColor: '#4CAF50',
-},
-cardImage: {
+  },
+  cardImage: {
     width: '100%',
     height: 200,
     borderRadius: 8,
-},
-emptyMessage: {
+  },
+  emptyMessage: {
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 20,
     color: '#999',
     marginTop: 20,
-},
+  },
 });
 
 // Main Navigator Component
 const Principal = () => {
   return (
-    <Tab.Navigator initialRouteName='Feed' screenOptions={{ tabBarActiveTintColor: 'blue' }}>
+    <Tab.Navigator initialRouteName='Feed' screenOptions={{ tabBarActiveTintColor: 'blue'}}>
       <Tab.Screen
         name="Feed"
         component={Inicio}
@@ -235,16 +240,15 @@ const Principal = () => {
         }}
       />
       <Tab.Screen
-        name="Perfil"
+        name="Peefil"
         component={Profile}
         options={({ navigation }) => ({
           tabBarLabel: 'Perfil',
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="account-circle" color={color} size={size} />
           ),
-          headerTitle: "",
           headerRight: () => (
-            <MaterialIcons name="logout" onPress={() => navigation.navigate('Login')} size={26} color="#f00" />
+            <MaterialIcons name="logout" onPress={() => navigation.navigate('Login')} size={30} color="#f00" paddingRight={10} />
           ),
         })}
       />

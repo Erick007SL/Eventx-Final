@@ -33,35 +33,35 @@ export default function Login() {
 
   const entrar = async () => {
     if (validar()) {
-        try {
-            const response = await axios.post('http://192.168.0.110:3000/api/users/login', {
-                email: email,
-                password: password,
-            });
+      try {
+        const response = await axios.post('http://20.9.130.209:3000/api/users/login', {
+          email: email,
+          password: password,
+        });
 
-            console.log(response.data); // Verifique a resposta do servidor
+        console.log(response.data); // Verifique a resposta do servidor
 
-            if (response.data && response.data.userId) {
-                // Verifica se userId está presente na resposta
-                console.log("Login realizado com sucesso! Navegando para a tela Principal...");
-                navigation.navigate("Principal"); // Navega para a tela Principal
-            } else {
-                // Se o userId não existir, considere como falha de login
-                alert("Login falhou: " + (response.data.message || "Erro desconhecido"));
-            }
-        } catch (error) {
-            // Tratamento de erros na requisição
-            if (error.response) {
-                alert("Erro ao fazer login: " + (error.response.data.message || 'Erro desconhecido'));
-            } else if (error.request) {
-                alert("Erro ao fazer login: Não houve resposta do servidor.");
-            } else {
-                alert("Erro ao fazer login: " + error.message);
-            }
-            console.error(error);
+        if (response.data && response.data.userId) {
+          // Verifica se userId está presente na resposta
+          console.log("Login realizado com sucesso! Navegando para a tela Principal...");
+          navigation.navigate("Principal"); // Navega para a tela Principal
+        } else {
+          // Se o userId não existir, considere como falha de login
+          alert("Login falhou: " + (response.data.message || "Erro desconhecido"));
         }
+      } catch (error) {
+        // Tratamento de erros na requisição
+        if (error.response) {
+          alert("Erro ao fazer login: " + (error.response.data.message || 'Erro desconhecido'));
+        } else if (error.request) {
+          alert("Erro ao fazer login: Não houve resposta do servidor.");
+        } else {
+          alert("Erro ao fazer login: " + error.message);
+        }
+        console.error(error);
+      }
     }
-};
+  };
 
 
   const irParaCadastro = () => {
@@ -70,12 +70,12 @@ export default function Login() {
 
   return (
     <View style={[styles.container, specificStyle.container]}>
-      <Text style={specificStyle.logo} h1>
-        Otnev<Text style={{ color: "blue" }} h3>e</Text>
+      <Text style={specificStyle.logo}>
+        Otnev<Text style={{ color: "blue" }}>e</Text>
       </Text>
       <Text style={specificStyle.span}> Seja bem-vindo ao nosso App, Otneve agradece a sua preferência. </Text>
-      
-      <Input
+
+      <Input style={specificStyle.input}
         placeholder="E-mail: "
         leftIcon={{ type: "font-awesome", name: "envelope" }}
         onChangeText={(value) => {
@@ -86,7 +86,7 @@ export default function Login() {
         errorMessage={errorEmail}
       />
 
-      <Input
+      <Input style={specificStyle.input}
         placeholder="Senha: "
         leftIcon={{ type: "font-awesome", name: "lock" }}
         onChangeText={(value) => {
@@ -120,28 +120,34 @@ export default function Login() {
 
 const specificStyle = StyleSheet.create({
   container: {
-    paddingTop: 60,
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
+    paddingTop: 160,
+    paddingLeft: 20,
+    paddingRight: 20,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+
   },
   textRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   textCadastro: {
+    paddingBottom: 135,
     fontSize: 18,
   },
   link: {
+    paddingBottom: 135,
     color: 'blue',
     fontSize: 18,
   },
   logo: {
-    marginBottom: 30, // Ajuste a margem conforme necessário
-    textAlign: 'center', // Centraliza o texto do logo
+    marginBottom: 30,
+    textAlign: 'center',
+    fontSize: 60,
   },
   span: {
-    marginBottom: 150,
+    marginBottom: 50,
     textAlign: 'center',
     fontSize: 12,
     fontWeight: 'bold',
