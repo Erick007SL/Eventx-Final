@@ -11,7 +11,8 @@ const DetalhesEvento = ({ route, navigation }) => {
     const fetchEventoDetalhes = async () => {
       try {
         // Requisição para pegar os detalhes do evento usando o ID
-        const response = await axios.get(`http://20.9.130.209:3000/api/events/${eventoId}`);
+        const response = await axios.get(`http://192.168.0.110:3000/api/events/${eventoId}`);
+        // const response = await axios.get(`http://20.9.130.209:3000/api/events/${eventoId}`);
         setEvento(response.data);
       } catch (error) {
         console.error('Erro ao buscar os detalhes do evento:', error);

@@ -5,7 +5,8 @@ const Eventos = ({ navigation }) => {
     const [eventos, setEventos] = useState([]);
 
     useEffect(() => {
-        fetch('http://20.9.130.209:3000/api/events')
+        fetch('http://192.168.0.110:3000/api/events')
+        // fetch('http://20.9.130.209:3000/api/events')
             .then((response) => response.json())
             .then((data) => setEventos(data))
             .catch((error) => console.error('Erro ao carregar eventos:', error));
@@ -32,7 +33,7 @@ const Eventos = ({ navigation }) => {
                             <Text style={styles.cardDescription}>{evento.description}</Text>
                             <Text style={styles.cardDate}>Data: {formatDate(evento.date)}</Text>
                             <Button ButtonStyle={styles.buttonCard}
-                                title="Ver mais..."
+                                title="Entrar"
                                 onPress={() => navigation.navigate('DetalhesEvento', { eventoId: evento.id })}
                             />
                         </View>

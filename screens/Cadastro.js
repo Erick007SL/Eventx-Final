@@ -50,8 +50,8 @@ export default function Cadastro() {
   const salvar = async () => {
     if (validar()) {
       try {
-        const response = await axios.post('http://20.9.130.209:3000/api/users/register', {
-        // const response = await axios.post('http://192.168.0.110:3000/api/users/register', {
+        // const response = await axios.post('http://20.9.130.209:3000/api/users/register', {
+        const response = await axios.post('http://192.168.0.110:3000/api/users/register', {
           username: nome,
           email: email,
           password: senha,

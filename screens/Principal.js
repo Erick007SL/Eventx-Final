@@ -2,50 +2,42 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, StyleSheet, Animated, Dimensions, Linking, ScrollView, Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation } from '@react-navigation/native';
 import { Camera } from 'expo-camera';
-import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Button } from 'react-native-elements';
 import axios from 'axios';
-import Eventos from './Eventos'
-import Login from './Login';
+import Eventos from './Eventos';
+import Profile from './Profile';
 
 const formatDate = (date) => {
   const d = new Date(date);
   return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
 };
 
-
 const Tab = createBottomTabNavigator();
 const { width, height } = Dimensions.get('window');
 
-// Feed Component
 const Feed = () => {
   const navigation = useNavigation();
-
   return (
     <View style={styles.container}>
       <Text>Início!</Text>
     </View>
   );
-}
-
+};
 
 const Inicio = () => {
-  // Estado para armazenar os eventos
   const [feed, setFeed] = useState([]);
 
-  // Função para buscar os eventos da API usando axios
   const fetchEventos = async () => {
     try {
-      const response = await axios.get('http://192.168.0.110:3000/api/events'); // Substitua pela URL da sua API
-      setFeed(response.data); // Atualiza o estado com os eventos recebidos
+      const response = await axios.get('http://192.168.0.110:3000/api/events');
+      setFeed(response.data);
     } catch (error) {
       console.error('Erro ao buscar eventos:', error);
     }
   };
 
-  // UseEffect para buscar os eventos quando o componente for montado
   useEffect(() => {
     fetchEventos();
   }, []);
@@ -58,8 +50,9 @@ const Inicio = () => {
             <View key={evento.id} style={styles.cardInicio}>
               {evento.coverImage && (
                 <Image
-                  source={{ uri: `http://20.9.130.209:3000/uploads/${evento.coverImage}` }}
-                  style={styles.cardImage} resizeMode='contain'
+                  source={{ uri: `http://192.168.0.110:3000/uploads/${evento.coverImage}` }}
+                  style={styles.cardImage}
+                  resizeMode="contain"
                 />
               )}
               <Text style={styles.cardTitle}>{evento.title}</Text>
@@ -73,31 +66,13 @@ const Inicio = () => {
             </View>
           ))
         ) : (
-          <Text style={styles.emptyMessage}>Carregando eventos...</Text> // Exibe enquanto os eventos não estiverem carregados
+          <Text style={styles.emptyMessage}>Carregando eventos...</Text>
         )}
       </ScrollView>
     </View>
   );
 };
 
-
-const Profile = () => {
-  return (
-    <View style={styles.container}>
-      <View style={{ backgroundColor: 'gray', width: '40%', borderRadius: 100, alignSelf: 'center', marginTop: 30 }}>
-        <MaterialIcons name="person" size={150} color="black" />
-      </View>
-      <Text style={{ paddingLeft: 20, fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Nome:___________________</Text>
-      <Text style={{ paddingLeft: 20, fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Nome:___________________</Text>
-      <Text style={{ paddingLeft: 20, fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Nome:___________________</Text>
-      <Text style={{ paddingLeft: 20, fontSize: 20, fontWeight: 'bold', marginTop: 20 }}>Nome:___________________</Text>
-
-
-    </View>
-  );
-};
-
-// Scanner Component
 const Scanner = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -105,62 +80,133 @@ const Scanner = () => {
 
   useEffect(() => {
     (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
   }, []);
 
   useEffect(() => {
-    const animateScanner = Animated.loop(
+    Animated.loop(
       Animated.sequence([
-        Animated.timing(animation, { toValue: height - 40, duration: 2500, useNativeDriver: true }),
-        Animated.timing(animation, { toValue: 0, duration: 2000, useNativeDriver: true })
+        Animated.timing(animation, {
+          toValue: 200,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(animation, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
       ])
-    );
-    animateScanner.start();
-    return () => animateScanner.stop();
+    ).start();
   }, [animation]);
 
   const handleBarCodeScanned = ({ data }) => {
     setScanned(true);
     if (data.startsWith('https://')) {
       Linking.openURL(data);
+    } else {
+      alert(`Código escaneado: ${data}`);
     }
   };
 
   if (hasPermission === null) {
-    return <Text>Permitir acesso à câmera...</Text>;
+    return <Text>Solicitando permissão para acessar a câmera...</Text>;
   }
   if (hasPermission === false) {
-    return <Text>Sem acesso à câmera</Text>;
+    return <Text>Sem permissão para acessar a câmera.</Text>;
   }
 
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} type={Camera.Constants.Type.back} onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}>
+      <Camera
+        style={StyleSheet.absoluteFillObject}
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+      >
         <View style={styles.overlay}>
           <View style={styles.unfocusedContainer}></View>
-          <View style={[styles.focusedContainer, { width: width - 40 }]}>
-            <View style={styles.unfocusedContent}></View>
-            <View style={styles.focusArea}>
-              <Animated.View style={[styles.animationLine, { transform: [{ translateY: animation }] }]} />
-            </View>
-            <View style={styles.unfocusedContent}></View>
+          <View style={styles.scanArea}>
+            <Animated.View
+              style={[
+                styles.scanLine,
+                { transform: [{ translateY: animation }] },
+              ]}
+            />
           </View>
+          <View style={styles.unfocusedContainer}></View>
         </View>
         <View style={styles.buttonContainer}>
-          <Button title={scanned ? 'Escanear novamente' : 'Escanear'} onPress={() => setScanned(false)} />
+          <Button
+            title={scanned ? 'Escanear novamente' : 'Escanear'}
+            onPress={() => setScanned(false)}
+          />
         </View>
       </Camera>
     </View>
   );
 };
 
+const Principal = () => {
+  return (
+    <Tab.Navigator
+      initialRouteName="Feed"
+      screenOptions={{
+        tabBarActiveTintColor: 'blue',
+        tabBarStyle: {
+          height: 80, 
+        },
+        tabBarLabelStyle: {
+          fontSize: 20, 
+        },
+      }}
+    >
+      <Tab.Screen
+        name="Feed"
+        component={Inicio}
+        options={{
+          tabBarLabel: 'Início',
+          tabBarIcon: ({ color, size }) => <MaterialIcons name="home" color={color} size={35} />,
+          headerTitle: '',
+        }}
+      />
+      <Tab.Screen
+        name="Eventos"
+        component={Eventos}
+        options={{
+          tabBarLabel: 'Eventos',
+          tabBarIcon: ({ color }) => <MaterialIcons name="event" color={color} size={35} />,
+          headerTitle: '',
+        }}
+      />
+      <Tab.Screen
+        name="Leitor"
+        component={Scanner}
+        options={{
+          tabBarLabel: 'Scaner',
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="data-matrix-scan" color={color} size={35} />,
+          headerTitle: '',
+        }}
+      />
+      <Tab.Screen
+        name="Perfil"
+        component={Profile}
+        options={{
+          tabBarLabel: 'Perfil',
+          tabBarIcon: ({ color }) => <MaterialIcons name="account-circle" color={color} size={35}/>,
+          headerTitle: '',
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
     backgroundColor: 'lightgray',
+    padding: 10,
   },
   scrollViewContainer: {
     paddingBottom: 20,
@@ -206,54 +252,58 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 20,
   },
+  profileIcon: {
+    backgroundColor: 'gray',
+    width: '40%',
+    borderRadius: 100,
+    alignSelf: 'center',
+    marginTop: 30,
+  },
+  profileText: {
+    paddingLeft: 20,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  logoutButton: {
+    marginTop: 30,
+    alignSelf: 'center',
+    backgroundColor: 'red',
+    width: '80%',
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  unfocusedContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    width: '100%',
+  },
+  scanArea: {
+    width: 250,
+    height: 250,
+    borderWidth: 2,
+    borderColor: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scanLine: {
+    width: '100%',
+    height: 2,
+    backgroundColor: 'red',
+    position: 'absolute',
+    top: 0,
+  },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 30,
+    alignSelf: 'center',
+  },
 });
-
-// Main Navigator Component
-const Principal = () => {
-  return (
-    <Tab.Navigator initialRouteName='Feed' screenOptions={{ tabBarActiveTintColor: 'blue'}}>
-      <Tab.Screen
-        name="Feed"
-        component={Inicio}
-        options={({ navigation }) => ({
-          tabBarLabel: 'Início',
-          tabBarIcon: ({ color, size }) => (<MaterialIcons name="home" color={color} size={size} />),
-          headerTitle: ""
-        })}
-      />
-      <Tab.Screen
-        name="Eventos"
-        component={Eventos}
-        options={{
-          tabBarLabel: 'Eventos',
-          tabBarIcon: ({ color, size }) => (<MaterialIcons name="event" color={color} size={size} />),
-          headerTitle: "",
-        }}
-      />
-      <Tab.Screen
-        name="Leitor"
-        component={Scanner}
-        options={{
-          tabBarLabel: 'Leitor de QrCode',
-          tabBarIcon: ({ color, size }) => (<MaterialCommunityIcons name="data-matrix-scan" color={color} size={size} />),
-          headerTitle: "",
-        }}
-      />
-      <Tab.Screen
-        name="Peefil"
-        component={Profile}
-        options={({ navigation }) => ({
-          tabBarLabel: 'Perfil',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="account-circle" color={color} size={size} />
-          ),
-          headerRight: () => (
-            <MaterialIcons name="logout" onPress={() => navigation.navigate('Login')} size={30} color="#f00" paddingRight={10} />
-          ),
-        })}
-      />
-    </Tab.Navigator>
-  );
-};
 
 export default Principal;
